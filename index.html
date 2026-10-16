@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gramalote · Un pueblo en el recuerdo</title>
+<meta name="description" content="Serie documental sobre Gramalote, Norte de Santander: su historia, su iglesia, su cultura cafetera y su cocina.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,800;1,9..144,400&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  /* =========================================================
+     PALETA: amarillo, azul y verde (colores originales del proyecto)
+     El logo SIEMPRE va en su verde (#058c3e) y no cambia de color.
+     Cambia un color aquí y cambia en toda la página.
+     ========================================================= */
+  :root{
+    --azul:#1b2a6b;          /* azul principal: títulos y textos fuertes */
+    --azul-medio:#3346a0;    /* azul para detalles */
+    --azul-suave:#dfe4f5;
+    --azul-fondo:#eef1fa;    /* fondo azul casi blanco */
+    --amarillo:#f7b500;      /* amarillo principal: acentos y barra */
+    --amarillo-oscuro:#b07f00;
+    --amarillo-fondo:#fff8e6;/* fondo amarillo casi blanco */
+    --verde:#23793a;         /* verde: acentos de texto y botones */
+    --verde-oscuro:#1b4d2b;  /* verde oscuro: sección Sabores y pie */
+    --verde-fondo:#eaf5ec;
+    --logo:#058c3e;          /* verde del logo (no cambia) */
+    --blanco:#ffffff;
+    --tinta:#1e2430;
+    --gris:#5a6170;
+    --linea:rgba(27,42,107,.14);
+    --radius:18px;
+    --maxw:1180px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{font-family:"DM Sans",system-ui,sans-serif;color:var(--tinta);background:var(--blanco);line-height:1.7;font-size:17px;-webkit-font-smoothing:antialiased}
+  img{max-width:100%;display:block}
+  a{color:inherit}
+  .wrap{max-width:var(--maxw);margin:0 auto;padding:0 24px}
+
+  /* ---------- Barra de progreso (amarillo → verde) ---------- */
+  #progress{position:fixed;top:0;left:0;height:4px;width:0;background:linear-gradient(90deg,var(--amarillo),var(--verde));z-index:100}
+
+  /* ---------- Navegación que cambia de color según el capítulo ----------
+     Cada sección tiene data-nav="azul | amarillo | verde".
+     El logo va dentro de una pastilla blanca, así se ve igual
+     (siempre verde) sin importar el color de la barra. */
+  .nav{--nav-bg:transparent;--nav-fg:var(--azul);--nav-accent:var(--amarillo);
+       position:fixed;inset:0 0 auto 0;z-index:50;background:var(--nav-bg);color:var(--nav-fg);
+       transition:background-color .6s ease, color .6s ease, box-shadow .4s}
+  .nav.solid{box-shadow:0 6px 24px rgba(27,42,107,.16)}
+  .nav[data-theme="azul"]    {--nav-bg:var(--azul);--nav-fg:#fff;--nav-accent:var(--amarillo)}
+  .nav[data-theme="amarillo"]{--nav-bg:var(--amarillo);--nav-fg:var(--azul);--nav-accent:var(--azul)}
+  .nav[data-theme="verde"]   {--nav-bg:var(--verde);--nav-fg:#fff;--nav-accent:var(--amarillo)}
+  .nav .wrap{display:flex;align-items:center;justify-content:space-between;height:72px}
+  .nav .pill{display:block;background:#fff;border-radius:999px;padding:7px 16px;box-shadow:0 2px 10px rgba(0,0,0,.08);opacity:0;transform:translateY(-6px);transition:opacity .35s, transform .35s}
+  .nav.solid .pill{opacity:1;transform:none}
+  .nav .logo{height:22px;width:auto;display:block}
+  .nav ul{display:flex;gap:30px;list-style:none}
+  .nav a.link{color:inherit;text-decoration:none;font-weight:500;font-size:15px;position:relative;padding:4px 0}
+  .nav a.link::after{content:"";position:absolute;left:0;bottom:-2px;height:2px;width:0;background:var(--nav-accent);transition:width .3s, background-color .6s}
+  .nav a.link:hover::after,.nav a.link.active::after{width:100%}
+  .nav a.link.active{font-weight:700}
+  .burger{display:none;background:none;border:0;color:inherit;font-size:28px;cursor:pointer}
+
+  /* ---------- Transiciones suaves entre fondos claros ---------- */
+  .fade{height:clamp(70px,10vw,140px);background:linear-gradient(180deg,var(--a) 0%,var(--b) 100%)}
+
+  /* ---------- Genéricos ---------- */
+  .pad{padding:100px 0}
+  .kicker{font-size:13px;letter-spacing:4px;text-transform:uppercase;font-weight:700;color:var(--verde)}
+  .title{font-family:"Fraunces",serif;font-weight:800;font-size:clamp(34px,5vw,56px);line-height:1.1;color:var(--azul);margin:12px 0 24px}
+  .title em{font-style:italic;font-weight:400;color:var(--verde)}
+  .lead{font-size:20px;color:var(--gris);max-width:640px}
+  .center{text-align:center}
+  .center .lead{margin:0 auto}
+  .barra{border-left:4px solid var(--amarillo);padding-left:22px}
+  /* pequeño acento con los tres colores del proyecto */
+  .bandera{display:flex;width:84px;height:5px;border-radius:3px;overflow:hidden;margin:0 0 22px}
+  .bandera i{flex:1}
+  .bandera i:nth-child(1){background:var(--amarillo)}
+  .bandera i:nth-child(2){background:var(--azul)}
+  .bandera i:nth-child(3){background:var(--verde)}
+  .center .bandera{margin-left:auto;margin-right:auto}
+
+  /* ---------- Portada ---------- */
+  .hero{padding:124px 0 0;text-align:center;background:var(--blanco);overflow:hidden}
+  .hero .eyebrow{display:inline-block;font-size:12px;letter-spacing:4px;text-transform:uppercase;font-weight:700;color:var(--azul);border:1px solid var(--linea);padding:8px 18px;border-radius:999px;margin-bottom:34px}
+  .hero .brand-logo{display:block;width:min(680px,86vw);height:auto;margin:0 auto;animation:rise 1.2s ease both}
+  .hero .sub{font-family:"Fraunces",serif;font-style:italic;font-size:clamp(22px,3vw,32px);color:var(--azul);margin-top:18px;animation:rise 1.2s .15s ease both}
+  .hero .meta{margin-top:10px;font-size:13px;letter-spacing:3px;text-transform:uppercase;color:var(--amarillo-oscuro);animation:rise 1.2s .3s ease both}
+  .hero-photo{margin:56px auto 0;max-width:1320px;padding:0 24px}
+  .hero-photo .frame{position:relative;border-radius:28px;overflow:hidden;aspect-ratio:21/9;box-shadow:0 40px 80px rgba(31,58,104,.18)}
+  .hero-photo img{position:absolute;inset:-12% 0;width:100%;height:124%;object-fit:cover;will-change:transform}
+  .hero-photo .cap{position:absolute;left:24px;bottom:20px;color:#fff;font-size:13px;letter-spacing:2px;text-transform:uppercase;text-shadow:0 2px 10px rgba(0,0,0,.6)}
+  @keyframes rise{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:none}}
+
+  /* ---------- Prólogo + foto con logo ---------- */
+  .prologo{background:var(--blanco)}
+  .banner{position:relative;border-radius:28px;overflow:hidden;aspect-ratio:1184/305;min-height:260px;box-shadow:0 30px 60px rgba(31,58,104,.18)}
+  .banner img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:65% 50%;filter:brightness(1.15)}
+  .banner::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(31,58,104,.45) 0%,rgba(31,58,104,0) 60%)}
+  /* placa blanca para que el logo verde se lea sobre la foto */
+  .banner .placa{position:absolute;z-index:2;left:5%;top:50%;transform:translateY(-50%);background:rgba(255,255,255,.94);border-radius:18px;padding:22px 30px 18px;box-shadow:0 16px 40px rgba(0,0,0,.2);border-bottom:5px solid var(--amarillo)}
+  .banner .placa svg{display:block;width:clamp(200px,30vw,380px);height:auto}
+  .banner .placa span{display:block;margin-top:10px;font-size:12px;letter-spacing:3px;text-transform:uppercase;color:var(--azul);font-weight:700}
+  .prologo .grid{display:grid;grid-template-columns:1fr 1.25fr;gap:64px;align-items:start;margin-top:72px}
+  .prologo .text p{margin-bottom:18px}
+  .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:36px}
+  .stat{border-top:3px solid var(--verde);padding-top:14px}
+  .stat:nth-child(1){border-color:var(--amarillo)}
+  .stat:nth-child(2){border-color:var(--azul)}
+  .stat:nth-child(3){border-color:var(--verde)}
+  .stat b{display:block;font-family:"Fraunces",serif;font-size:36px;color:var(--azul);line-height:1}
+  .stat:nth-child(3) b{color:var(--verde)}
+  .stat:nth-child(1) b{color:var(--azul)}
+  .stat small{font-size:13px;color:var(--gris);text-transform:uppercase;letter-spacing:1px}
+
+  /* ---------- Historia (incluye 2010) ---------- */
+  .historia{background:var(--amarillo-fondo)}
+  .timeline{position:relative;margin-top:70px}
+  .timeline::before{content:"";position:absolute;left:50%;top:0;bottom:0;width:2px;background:linear-gradient(var(--amarillo),var(--azul-medio));transform:translateX(-50%)}
+  .event{position:relative;width:50%;padding:0 56px 64px}
+  .event:nth-child(odd){text-align:right}
+  .event:nth-child(even){margin-left:50%}
+  .event::before{content:"";position:absolute;top:12px;width:18px;height:18px;border-radius:50%;background:#fff;border:4px solid var(--amarillo)}
+  .event:nth-child(odd)::before{right:-9px}
+  .event:nth-child(even)::before{left:-9px}
+  .year{font-family:"Fraunces",serif;font-size:50px;font-weight:800;color:var(--amarillo-oscuro);line-height:1}
+  .event h3{font-family:"Fraunces",serif;font-size:24px;color:var(--azul);margin:8px 0 10px}
+  .event p{color:var(--gris);font-size:16px}
+
+  /* bloque destacado de 2010 dentro de Historia */
+  .dosmil{position:relative;background:#fff;border-radius:24px;padding:64px 56px 56px;text-align:center;box-shadow:0 24px 60px rgba(31,58,104,.1);border-top:6px solid var(--amarillo);overflow:hidden}
+  .dosmil::before{content:"";position:absolute;inset:0;background:url("img/iglesia-ruinas.jpg") center/cover;opacity:.06;filter:grayscale(1)}
+  .dosmil > *{position:relative}
+  .dosmil .year-big{font-family:"Fraunces",serif;font-size:clamp(84px,14vw,170px);font-weight:800;line-height:.9;color:transparent;-webkit-text-stroke:2px var(--azul-medio)}
+  .dosmil .title{margin-top:6px}
+  .dosmil .lead{margin:0 auto}
+  .dias{display:grid;grid-template-columns:1fr 1fr;gap:24px;max-width:860px;margin:44px auto 0;text-align:left}
+  .dia{background:var(--azul-fondo);border-radius:var(--radius);padding:26px;border-left:4px solid var(--azul-medio)}
+  .dia b{font-family:"Fraunces",serif;font-size:21px;color:var(--azul)}
+  .dia p{color:var(--gris);font-size:16px;margin-top:6px}
+  .dosmil blockquote{font-family:"Fraunces",serif;font-style:italic;font-size:clamp(28px,4vw,48px);line-height:1.2;color:var(--azul);max-width:820px;margin:64px auto 0}
+  .dosmil blockquote::before{content:"“";display:block;font-size:100px;line-height:.6;color:var(--amarillo);font-style:normal}
+  .dosmil cite{display:block;margin-top:20px;font-style:normal;font-size:13px;letter-spacing:3px;text-transform:uppercase;color:var(--verde)}
+
+  /* ---------- Iglesia ---------- */
+  .iglesia{background:var(--azul-fondo)}
+  .iglesia .grid{display:grid;grid-template-columns:1.05fr 1fr;gap:72px;align-items:center}
+  .iglesia .photo img{border-radius:var(--radius);width:100%;aspect-ratio:4/5;object-fit:cover;box-shadow:0 30px 60px rgba(31,58,104,.18)}
+  .facts{list-style:none;margin-top:28px;border-top:1px solid var(--linea)}
+  .facts li{display:flex;gap:18px;padding:16px 0;border-bottom:1px solid var(--linea)}
+  .facts b{font-family:"Fraunces",serif;color:var(--azul-medio);min-width:70px;font-size:20px}
+
+  /* ---------- Cultura ---------- */
+  .cultura{background:var(--amarillo-fondo)}
+  .cards{display:grid;grid-template-columns:repeat(3,1fr);gap:28px;margin-top:56px}
+  .card{background:#fff;border-radius:var(--radius);overflow:hidden;border:1px solid var(--linea);transition:transform .35s, box-shadow .35s}
+  .card:hover{transform:translateY(-8px);box-shadow:0 24px 50px rgba(31,58,104,.12)}
+  .card .band{height:6px}
+  .card .body{padding:32px 28px}
+  .card .icon{width:56px;height:56px;border-radius:14px;display:grid;place-items:center;margin-bottom:20px}
+  .card .icon svg{width:28px;height:28px}
+  .card h3{font-family:"Fraunces",serif;font-size:24px;color:var(--azul);margin-bottom:10px}
+  .card p{color:var(--gris);font-size:16px}
+  .c-amarillo .band{background:var(--amarillo)} .c-amarillo .icon{background:var(--amarillo-fondo);color:var(--amarillo-oscuro)}
+  .c-verde .band{background:var(--verde)}  .c-verde .icon{background:var(--verde-fondo);color:var(--verde)}
+  .c-azul .band{background:var(--azul-medio)}  .c-azul .icon{background:var(--azul-fondo);color:var(--azul)}
+
+  /* ---------- Sabores (verde oscuro) ---------- */
+  .sabores{background:var(--verde-oscuro);color:#fff}
+  .sabores .title{color:#fff}
+  .sabores .title em{color:var(--amarillo)}
+  .sabores .kicker{color:var(--amarillo)}
+  .sabores .lead{color:rgba(255,255,255,.82)}
+  .sabores .grid{display:grid;grid-template-columns:1fr 1.15fr;gap:64px;align-items:start;margin-top:56px}
+  .platos{display:grid;gap:22px}
+  .plato{position:relative}
+  .plato img{border-radius:var(--radius);width:100%;object-fit:cover;box-shadow:0 30px 60px rgba(0,0,0,.35)}
+  .plato.a img{aspect-ratio:1/1}
+  .plato.b img{aspect-ratio:4/3;object-position:50% 60%}
+  .plato .tag{position:absolute;top:16px;left:16px;background:var(--amarillo);color:var(--azul);font-weight:700;font-size:12px;letter-spacing:2px;text-transform:uppercase;padding:7px 13px;border-radius:999px}
+  .menu{list-style:none}
+  .menu li{padding:24px 0;border-bottom:1px dashed rgba(255,255,255,.22)}
+  .menu li:first-child{padding-top:0}
+  .menu .row{display:flex;align-items:baseline;gap:14px}
+  .menu h3{font-family:"Fraunces",serif;font-size:26px;font-weight:600;color:#fff}
+  .menu .dots{flex:1;border-bottom:2px dotted rgba(255,255,255,.28);transform:translateY(-6px)}
+  .menu .when{font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--amarillo);font-weight:700;white-space:nowrap}
+  .menu p{color:rgba(255,255,255,.8);margin-top:6px;font-size:16px}
+
+  /* ---------- Paisajes: la foto se funde con los fondos claros ---------- */
+  .paisajes{position:relative;min-height:90vh;display:flex;align-items:center;color:#fff;overflow:hidden;background:var(--verde-oscuro)}
+  .paisajes .bg{position:absolute;inset:-10% 0;background:url("img/cascada.jpg") center/cover no-repeat;will-change:transform}
+  .paisajes::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,var(--verde-oscuro) 0%,rgba(27,77,43,.45) 20%,rgba(15,25,30,.45) 50%,rgba(27,42,107,.25) 80%,var(--blanco) 100%)}
+  .paisajes .wrap{position:relative;z-index:2;text-align:center}
+  .paisajes .title{color:#fff;text-shadow:0 4px 30px rgba(0,0,0,.45)}
+  .paisajes .title em{color:#fff;text-decoration:underline;text-decoration-color:var(--amarillo);text-decoration-thickness:4px;text-underline-offset:8px}
+  .paisajes .kicker{color:var(--azul);background:var(--amarillo);padding:6px 14px;border-radius:999px;font-size:12px}
+  .paisajes p{max-width:640px;margin:0 auto;font-size:19px;color:#fff;text-shadow:0 2px 16px rgba(0,0,0,.55)}
+
+  /* ---------- Renacer ---------- */
+  .renacer{background:var(--blanco);text-align:center}
+  .renacer .lead{margin:0 auto}
+  .btn{display:inline-flex;align-items:center;gap:10px;margin-top:36px;background:var(--verde);color:#fff;text-decoration:none;font-weight:700;padding:16px 30px;border-radius:999px;transition:background .3s, transform .3s}
+  .btn:hover{background:var(--azul-medio);transform:translateY(-3px)}
+
+  /* ---------- Pie de página ---------- */
+  footer{background:var(--azul);color:rgba(255,255,255,.82);padding:64px 0 30px;font-size:15px;border-top:5px solid var(--amarillo)}
+  footer .cols{display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:48px}
+  footer .placa-logo{display:inline-block;background:#fff;border-radius:14px;padding:12px 18px;margin-bottom:16px}
+  footer .flogo{display:block;width:200px;height:auto}
+  footer h4{color:var(--amarillo);font-size:13px;letter-spacing:3px;text-transform:uppercase;margin-bottom:18px}
+  footer ul{list-style:none}
+  footer li{margin-bottom:10px}
+  footer a{text-decoration:none}
+  footer a:hover{color:var(--amarillo)}
+  .social{display:flex;gap:12px}
+  .social a{width:40px;height:40px;border-radius:10px;background:rgba(255,255,255,.1);color:#fff;display:grid;place-items:center;transition:background .3s,color .3s}
+  .social a:hover{background:var(--amarillo);color:var(--azul)}
+  .social svg{width:18px;height:18px}
+  .copy{border-top:1px solid rgba(255,255,255,.15);margin-top:56px;padding-top:24px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px;font-size:13px;opacity:.75}
+
+  /* ---------- Animaciones ---------- */
+  .reveal{opacity:0;transform:translateY(40px);transition:opacity .9s ease, transform .9s ease}
+  .reveal.in{opacity:1;transform:none}
+  .reveal.d1{transition-delay:.12s}.reveal.d2{transition-delay:.24s}
+  @media (prefers-reduced-motion:reduce){.reveal{opacity:1;transform:none;transition:none}html{scroll-behavior:auto}*{animation:none!important}}
+
+  /* ---------- Responsive ---------- */
+  @media (max-width:900px){
+    .pad{padding:76px 0}
+    .nav .pill{opacity:1;transform:none}
+    .nav ul{position:fixed;top:75px;right:0;left:0;flex-direction:column;gap:0;background:var(--nav-bg);padding:8px 24px 20px;transform:translateY(-140%);transition:transform .35s;box-shadow:0 12px 24px rgba(0,0,0,.08)}
+    .nav:not(.solid) ul{background:#fff;color:var(--azul)}
+    .nav ul.open{transform:none}
+    .nav ul li{padding:12px 0;border-bottom:1px solid var(--linea)}
+    .burger{display:block}
+    .hero{padding-top:108px}
+    .hero-photo .frame{aspect-ratio:4/3;border-radius:20px}
+    .banner{aspect-ratio:4/3;border-radius:20px}
+    .banner .placa{top:auto;bottom:18px;left:18px;right:18px;transform:none;padding:16px 20px 14px}
+    .banner .placa svg{width:100%;max-width:300px}
+    .prologo .grid,.iglesia .grid,.sabores .grid{grid-template-columns:1fr;gap:40px}
+    .prologo .grid{gap:8px;margin-top:48px}
+    .cards,.dias{grid-template-columns:1fr}
+    .dosmil{padding:48px 22px 40px}
+    .timeline::before{left:12px}
+    .event,.event:nth-child(even){width:100%;margin-left:0;text-align:left;padding:0 0 52px 48px}
+    .event:nth-child(odd)::before,.event:nth-child(even)::before{left:3px;right:auto}
+    .year{font-size:40px}
+    footer .cols{grid-template-columns:1fr}
+  }
+  @media (max-width:520px){
+    body{font-size:16px}
+    .stats{gap:10px}
+    .stat b{font-size:26px}
+    .stat small{font-size:11px;letter-spacing:.5px}
+    .menu h3{font-size:21px}
+    .menu .dots{display:none}
+    .hero .eyebrow{font-size:10px;letter-spacing:2px;padding:7px 14px}
+    .hero-photo .cap{display:none}
+  }
+</style>
+</head>
+<body>
+<!-- Logo vectorial (SVG), siempre en su verde original -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="logo" viewBox="39.1 32.1 865.6 161.6"><path fill="#058c3e" fill-rule="evenodd" d="M468.50,97.50 467.25,96.25 463.75,94.88 461.50,94.50 458.75,94.38 455.88,94.00 438.38,94.00 436.50,94.25 434.62,94.75 432.62,94.88 431.62,95.12 429.25,96.25 427.38,98.38 426.12,100.62 425.50,103.88 425.12,107.25 425.12,109.12 425.38,110.75 425.50,114.62 425.75,116.75 425.88,122.88 425.62,124.50 425.12,126.12 425.00,127.50 423.88,129.38 422.12,130.88 420.38,131.62 418.62,132.00 416.25,132.00 415.50,132.25 413.38,132.25 413.25,132.12 410.62,132.12 410.50,132.00 407.62,132.00 405.75,131.62 403.50,130.25 402.25,128.88 401.62,127.75 400.88,125.12 400.75,122.75 400.50,121.62 400.50,117.50 400.88,114.25 400.88,107.25 400.75,107.12 400.62,103.88 400.12,102.12 399.88,100.12 398.75,98.12 398.25,97.50 396.88,96.38 396.12,96.00 394.88,95.75 392.75,95.00 387.88,95.00 387.75,94.88 383.50,94.88 383.38,94.75 373.62,94.75 373.50,94.88 363.00,95.00 361.25,95.75 360.12,96.00 358.62,97.00 357.25,98.75 356.88,99.88 356.00,101.50 355.88,123.38 355.75,123.50 355.75,127.88 355.50,130.12 355.38,139.38 355.00,143.25 355.00,163.25 355.38,166.00 355.38,169.00 355.50,169.12 355.50,170.75 356.00,175.75 357.25,178.75 358.00,179.75 359.88,181.38 360.62,181.75 362.00,182.00 363.75,182.62 365.62,182.88 369.00,183.00 369.12,183.12 373.00,183.25 373.12,183.38 378.25,183.50 378.38,183.62 384.88,183.62 386.75,183.88 388.88,183.88 390.50,183.62 393.38,183.62 393.50,183.50 399.00,183.50 401.25,183.25 405.38,183.25 405.50,183.12 411.25,183.12 411.38,183.00 416.00,183.00 416.12,182.88 426.25,182.88 426.38,182.75 431.38,182.75 433.62,182.50 439.38,182.50 439.50,182.38 448.62,182.38 448.75,182.50 451.38,182.50 451.50,182.62 454.75,182.62 456.12,182.88 461.38,182.88 462.25,182.62 463.00,182.62 464.12,182.12 465.25,181.88 467.38,180.50 468.75,179.12 469.38,178.25 470.50,175.38 470.50,168.75 470.25,167.50 470.12,158.38 470.25,158.25 470.25,152.62 470.38,152.50 470.38,149.38 470.50,149.25 470.50,144.50 470.88,142.62 470.88,134.25 471.00,134.12 471.00,128.88 471.12,128.75 471.12,124.50 471.25,124.38 471.25,117.50 471.12,117.38 471.12,114.62 471.00,114.50 471.00,111.88 470.88,111.75 470.88,104.12 469.75,99.75ZM451.38,143.88 452.75,143.88 453.50,144.12 455.12,145.88 455.88,147.00 456.75,148.88 457.00,149.88 457.88,151.88 458.12,153.75 458.75,155.62 459.00,158.62 459.62,160.62 460.00,163.62 460.00,168.38 459.38,170.00 458.62,171.12 456.88,172.62 454.50,173.75 453.25,174.00 450.12,173.88 448.00,173.00 446.12,171.50 445.12,169.75 444.88,168.25 444.38,167.25 444.38,164.75 444.88,162.00 445.00,159.75 445.75,156.88 446.00,154.38 446.88,151.75 447.00,150.75 447.50,149.62 448.00,147.75 448.62,146.88 449.12,145.75 450.62,144.12ZM372.38,143.88 374.62,143.88 375.25,144.12 376.62,145.88 377.75,148.38 378.00,149.75 378.88,152.00 379.00,153.00 379.88,155.50 380.25,158.50 380.88,160.50 381.00,163.38 381.38,165.50 381.38,167.25 380.88,169.38 379.75,171.12 377.88,172.75 376.62,173.12 375.88,173.62 374.88,173.88 371.62,173.75 368.62,172.50 367.88,172.00 366.25,170.12 365.50,168.00 365.50,165.25 365.88,163.00 366.00,160.25 366.75,157.62 367.00,155.38 367.62,153.62 368.00,151.50 369.00,148.38 369.88,146.88 370.25,145.75 371.50,144.25ZM413.75,143.75 415.00,144.12 416.00,145.12 418.00,149.88 418.25,151.38 418.75,152.50 419.00,154.12 419.75,156.12 420.12,159.12 420.88,162.00 421.12,167.12 420.75,169.25 419.88,170.75 418.75,171.88 417.62,172.62 415.50,173.62 414.62,173.88 412.62,174.00 412.50,173.88 411.25,173.88 410.50,173.62 408.00,172.12 407.12,171.25 406.25,170.00 405.75,168.00 405.88,160.50 406.38,158.12 406.62,157.62 407.00,154.62 407.50,152.50 407.88,151.62 408.00,150.38 408.25,149.62 408.75,149.00 409.12,147.38 409.88,145.75 410.75,144.62 411.50,144.00ZM353.88,90.25 354.00,91.38 354.50,91.88 401.12,91.88 401.88,91.62 402.25,91.12 402.25,88.25 402.00,87.50 401.00,87.00 354.75,87.00 354.25,87.25 354.00,87.75 354.00,90.12ZM732.38,93.00 726.25,90.25 724.62,89.88 722.88,89.12 720.88,88.75 719.38,88.12 716.75,87.88 714.00,87.12 709.25,86.75 708.12,86.50 703.88,86.38 703.75,86.25 699.75,86.38 697.88,86.62 696.12,86.62 692.38,87.12 691.00,87.12 689.00,87.88 686.50,88.00 683.00,89.00 681.62,89.75 680.25,90.12 678.00,91.25 676.25,92.50 675.00,93.12 674.25,93.88 672.62,95.00 669.88,97.62 667.00,101.00 665.12,103.62 663.00,107.25 662.12,109.12 661.88,110.12 661.00,111.62 660.25,113.50 659.88,115.38 659.00,117.38 658.75,119.50 658.38,120.38 658.12,121.62 657.88,124.62 657.25,128.00 657.12,133.75 657.25,133.88 657.38,137.38 658.00,141.38 658.00,142.88 658.25,144.12 658.62,145.00 659.00,147.38 659.88,149.62 660.25,151.50 660.88,152.50 661.12,153.50 661.88,154.75 662.00,155.38 664.12,159.50 667.00,163.50 670.38,167.25 672.38,169.00 675.38,171.00 680.25,173.50 682.50,174.00 684.75,174.88 686.75,175.12 688.38,175.62 690.62,175.88 692.88,175.88 693.00,176.00 702.25,176.00 702.38,175.88 706.12,175.75 709.50,175.00 711.25,174.88 712.88,174.25 714.88,173.88 717.00,173.12 719.38,172.62 720.38,172.00 721.38,171.75 722.75,171.00 725.62,169.88 727.88,168.75 728.38,168.25 729.88,167.62 735.50,163.88 741.00,159.12 741.50,158.38 744.50,155.12 747.00,151.62 749.88,146.62 750.00,146.00 751.50,143.00 752.12,140.12 752.75,138.50 752.88,136.75 753.25,135.50 753.75,131.62 753.75,127.50 752.75,120.38 752.12,118.75 751.75,116.75 751.25,115.62 750.88,114.12 750.00,112.38 749.75,111.38 748.62,109.00 747.88,108.00 746.75,105.88 743.88,102.00 739.38,97.62 737.12,96.00 736.50,95.75 735.38,94.75 733.38,93.75ZM712.25,106.00 715.25,107.50 716.75,108.88 717.38,109.12 719.88,111.50 721.75,114.25 723.88,118.62 724.88,122.50 725.50,126.38 725.38,132.12 725.00,134.00 724.88,135.75 724.12,137.88 723.88,139.38 723.00,141.12 722.75,142.12 721.88,144.12 721.25,144.88 720.62,146.25 719.75,147.50 718.38,148.88 717.88,149.75 715.62,152.00 711.88,154.62 709.38,155.88 707.88,156.25 706.88,156.75 704.50,157.12 703.00,157.62 701.88,157.62 700.62,157.88 696.25,157.75 694.00,156.88 692.62,155.88 690.88,154.25 689.12,152.12 687.12,148.38 686.00,145.50 685.62,143.75 685.25,143.12 684.75,140.00 684.12,137.75 684.12,136.75 683.88,135.75 684.00,126.50 685.25,120.88 685.75,120.00 686.25,118.00 688.88,112.88 692.38,109.25 694.00,108.00 697.88,106.12 700.38,105.62 701.75,105.12 708.00,105.00ZM424.00,86.38 424.00,89.25 424.25,89.75 424.75,90.00 471.12,90.00 471.50,89.88 472.00,89.38 472.25,88.00 472.12,86.62 471.75,85.88 471.25,85.50 465.38,85.50 465.25,85.62 464.88,85.50 429.88,85.50 429.75,85.62 424.50,85.50ZM542.12,79.12 539.00,78.00 535.75,78.12 533.12,79.12 531.50,80.12 529.25,81.88 527.38,83.75 524.12,88.00 523.88,88.62 520.50,93.50 519.75,95.00 518.88,96.12 517.75,98.25 517.25,98.88 515.62,102.00 515.00,102.75 514.62,103.75 512.88,106.88 511.00,111.12 510.00,112.75 509.88,113.38 508.12,116.75 507.88,117.62 507.12,118.75 507.00,119.50 506.25,121.12 506.00,122.12 505.12,123.62 504.75,124.88 504.25,125.75 503.88,127.38 503.12,128.50 502.75,130.00 502.12,131.25 501.88,132.50 501.12,133.88 500.75,135.25 500.12,136.50 499.75,138.12 498.12,142.12 497.88,143.75 497.12,145.50 496.88,146.75 496.00,149.00 495.75,150.38 495.12,152.00 494.88,153.50 494.25,155.00 493.88,157.12 493.25,158.75 492.38,162.00 491.88,165.00 491.00,168.00 490.88,169.50 490.12,172.62 490.00,176.50 490.38,178.12 491.00,179.75 492.12,181.12 492.88,181.75 496.50,183.62 502.62,184.62 504.62,184.62 506.88,184.00 508.25,183.88 511.12,182.62 511.62,182.12 512.00,181.38 513.88,179.75 515.62,177.00 515.88,176.12 516.62,174.88 517.12,172.50 517.62,171.50 518.12,168.62 518.75,167.00 519.12,164.88 519.75,163.12 520.12,160.50 520.75,159.25 520.88,158.25 522.00,155.00 522.75,154.12 523.12,154.00 530.25,153.88 536.12,153.12 541.12,153.12 543.88,154.00 544.75,154.88 545.75,156.88 546.00,158.38 546.75,160.00 546.88,160.88 547.38,162.00 549.12,165.12 551.12,167.62 552.62,168.88 554.00,169.75 556.88,171.00 559.50,171.50 561.62,171.50 564.50,171.12 566.62,170.62 567.62,170.12 568.62,169.88 571.12,168.50 572.88,167.00 573.75,165.62 574.75,162.50 574.62,160.38 573.88,157.12 573.12,155.50 572.75,154.00 572.00,152.62 571.75,151.50 571.00,150.00 570.62,148.62 570.25,148.12 569.62,145.75 569.00,144.50 568.75,142.88 568.00,141.00 567.62,138.88 567.12,137.75 566.62,135.12 566.00,133.38 565.75,131.12 565.00,128.88 564.88,127.38 564.12,125.62 563.88,123.50 563.00,121.12 562.75,119.12 562.00,117.62 561.75,115.62 561.12,114.12 560.88,112.38 560.00,110.50 559.62,108.38 559.00,106.88 559.00,106.38 558.50,104.88 558.00,103.88 557.62,102.25 557.12,101.38 556.62,99.62 556.12,98.75 555.75,97.25 555.00,95.50 551.50,88.50 547.50,83.25 544.12,80.25ZM537.00,113.88 537.62,114.50 537.88,115.38 538.12,119.00 538.62,120.50 539.12,125.25 539.88,128.25 540.12,132.38 539.50,133.00 538.25,133.62 536.88,134.00 535.38,134.00 533.88,134.38 530.88,134.12 529.62,133.62 529.25,133.25 528.88,131.75 529.00,131.00 529.75,129.75 530.00,128.25 530.62,127.12 532.12,122.50 532.88,121.12 533.00,120.38 533.75,119.00 534.12,117.75 536.12,114.12 536.38,113.88ZM290.00,72.25 287.75,73.12 287.00,73.75 284.75,75.00 282.50,76.75 278.88,80.38 277.88,81.88 277.12,82.62 276.75,83.38 275.00,85.38 274.12,87.00 272.88,88.62 271.75,90.88 270.25,92.88 269.75,94.12 268.25,96.50 264.12,104.62 264.00,105.38 263.12,106.88 262.88,107.88 262.00,109.50 261.75,110.62 261.00,111.88 260.75,112.88 260.12,114.00 259.75,115.62 259.12,116.75 258.88,117.88 258.12,119.12 257.88,120.38 256.25,123.88 255.00,128.00 254.25,129.38 253.75,131.12 253.12,132.25 252.75,133.75 252.25,134.62 251.75,136.50 251.12,137.62 250.88,138.62 250.12,140.12 249.62,142.12 249.12,143.00 248.00,149.62 247.88,153.62 247.12,156.00 246.62,159.38 246.12,160.50 245.75,164.25 245.75,166.88 246.12,169.00 247.25,171.12 249.00,172.88 250.88,173.88 252.62,174.00 253.62,174.75 254.25,175.00 258.12,175.75 260.75,175.75 263.88,175.00 265.00,174.50 267.25,173.00 269.00,171.25 271.50,167.25 272.00,165.38 272.75,163.62 273.00,161.88 273.75,159.62 273.88,157.12 274.12,156.38 274.50,156.00 276.25,155.50 279.12,155.25 280.12,155.00 283.25,154.88 286.00,154.25 290.00,154.00 290.12,153.88 292.75,153.88 295.62,153.25 299.88,152.88 300.88,153.12 301.50,153.75 302.62,159.25 303.00,162.88 303.00,165.88 304.00,171.62 305.12,175.00 306.62,177.00 308.88,178.88 309.50,179.00 311.25,179.88 313.62,180.12 315.00,180.50 317.88,180.50 322.25,179.88 325.12,178.75 327.50,177.25 328.88,175.88 329.75,174.50 330.88,170.62 330.88,165.25 330.50,162.75 330.38,160.38 330.00,159.12 329.75,155.38 329.00,152.38 328.88,150.62 328.00,148.12 327.75,146.00 327.00,144.00 326.75,142.00 326.00,140.12 325.75,138.00 325.00,136.12 324.88,134.50 324.00,132.62 323.88,131.38 323.12,129.62 323.00,128.50 322.25,127.12 321.75,125.00 321.12,123.62 320.62,121.62 320.00,120.38 319.75,118.88 319.25,117.75 318.75,115.88 318.25,115.00 317.75,112.88 317.12,111.62 316.88,110.25 316.12,108.62 315.75,107.00 315.00,105.25 314.88,104.38 314.25,103.25 313.75,101.12 313.12,100.00 312.75,98.50 312.12,97.25 311.75,95.75 311.12,94.38 310.75,92.62 310.00,91.00 309.62,88.88 309.12,87.75 308.88,85.38 308.25,84.00 307.75,81.88 306.75,79.38 305.62,77.50 303.62,75.12 300.00,73.00 297.75,72.12 295.38,71.75 291.88,71.88ZM290.38,110.38 290.75,110.88 291.88,113.88 292.12,116.38 292.88,118.38 293.12,120.88 293.88,122.62 294.12,125.00 294.88,127.25 295.00,128.75 295.62,130.50 295.62,131.38 294.25,132.75 292.88,133.12 291.25,133.88 285.00,134.50 280.62,134.50 280.00,133.75 280.00,132.88 280.88,131.62 281.00,130.50 281.75,129.00 282.00,127.75 282.75,126.12 283.00,125.12 283.62,124.12 284.12,122.38 284.88,121.00 285.12,120.00 285.75,119.00 286.00,118.00 286.88,116.38 288.25,112.88 289.25,111.12 290.00,110.38ZM846.50,73.12 844.88,74.00 843.50,74.50 842.12,75.50 840.62,77.00 840.12,78.00 840.12,79.00 840.50,80.12 840.62,83.38 840.88,85.62 840.88,90.75 840.75,90.88 840.75,94.00 840.62,94.12 840.50,98.50 840.38,98.62 840.25,104.38 840.00,106.25 839.88,115.38 839.62,117.00 839.50,120.25 839.00,123.38 838.75,137.88 838.62,138.00 838.38,147.62 838.25,147.75 838.25,153.75 838.38,153.88 838.38,155.88 838.50,156.00 839.00,164.62 840.00,168.25 840.25,170.25 840.75,171.25 841.12,172.75 841.88,174.12 842.25,175.38 843.50,176.50 845.62,177.75 847.25,178.12 848.50,178.75 850.62,179.00 853.38,179.75 856.75,180.12 858.38,180.12 861.12,180.62 863.88,180.75 864.00,180.88 872.38,180.88 872.50,180.75 875.00,180.75 877.50,180.38 879.00,180.38 880.38,180.00 881.62,180.00 884.25,179.62 885.50,179.12 887.62,178.75 888.62,178.25 890.38,177.75 893.62,176.00 894.25,175.50 895.25,174.38 895.88,173.12 896.12,172.00 896.12,170.12 895.88,168.88 895.50,168.00 894.50,166.88 893.25,166.12 890.75,165.38 889.38,165.25 888.88,165.00 875.50,165.00 875.38,164.88 872.50,164.75 869.38,163.88 868.88,163.62 868.12,162.88 867.12,159.50 866.88,155.38 866.25,151.62 866.25,149.88 865.88,146.25 865.88,142.75 866.00,142.62 866.12,139.62 866.75,137.62 867.00,135.62 867.88,133.62 869.12,132.12 870.38,131.38 873.38,130.12 876.12,129.75 877.75,129.12 879.88,128.75 881.00,128.25 884.50,127.75 886.62,127.00 887.25,127.00 889.25,126.12 891.25,125.62 895.62,123.00 897.12,121.25 897.75,120.12 898.00,119.25 898.12,115.50 897.75,113.75 897.12,112.50 895.38,110.75 894.12,110.12 892.38,109.62 888.88,109.00 886.75,109.00 881.75,109.88 878.88,110.12 877.00,110.88 874.75,111.12 873.38,111.75 871.00,112.12 869.38,112.88 867.88,112.88 867.25,112.62 866.75,112.12 866.75,109.62 866.88,109.50 866.88,105.62 867.00,105.50 867.12,100.75 867.38,98.88 867.38,96.75 867.62,94.50 867.88,93.75 867.88,91.75 868.25,90.88 869.00,90.25 869.88,90.00 872.00,89.88 872.75,89.62 874.00,89.62 876.50,89.12 882.50,88.88 886.00,88.12 887.00,88.12 888.12,87.88 890.00,87.88 893.88,86.88 896.25,85.88 897.88,84.50 898.50,83.38 898.75,82.50 898.62,80.88 898.12,80.12 897.62,78.75 896.38,77.25 895.12,76.25 892.62,75.00 892.00,74.88 891.00,74.25 889.88,73.88 888.75,73.75 887.50,73.12 885.38,72.88 882.25,72.00 878.75,71.88 877.38,71.38 875.25,71.25 874.12,71.00 869.25,70.88 869.12,70.75 861.38,70.75 861.25,70.88 856.12,71.12 853.50,71.75 849.62,72.25ZM598.75,67.00 597.75,67.88 595.88,68.62 594.38,70.12 593.12,72.38 592.38,75.62 592.50,80.50 592.88,82.25 593.00,84.25 593.88,87.38 594.00,89.50 594.75,93.12 595.00,95.50 595.00,111.75 594.88,111.88 594.88,115.12 594.75,115.25 594.75,119.38 594.62,119.50 594.50,124.12 594.38,124.25 594.38,127.38 594.25,127.50 594.12,132.38 594.00,132.50 593.88,143.38 593.75,143.50 593.75,146.12 593.50,148.62 593.38,154.25 593.00,157.00 593.00,175.88 593.25,177.25 593.88,178.00 596.00,178.88 597.88,179.12 600.00,179.88 601.62,180.00 603.88,180.75 607.38,181.12 608.75,181.62 610.50,181.88 612.75,182.00 616.25,182.88 619.62,183.00 622.12,183.50 623.00,183.50 624.25,183.88 630.12,184.00 632.50,184.25 639.25,184.25 640.25,184.00 645.00,183.75 646.12,183.50 647.25,183.00 649.00,182.88 650.50,182.12 651.50,181.88 653.38,180.62 655.00,179.00 656.00,177.38 656.88,175.50 657.12,174.50 657.12,172.62 656.88,171.38 655.75,169.50 655.00,168.75 653.00,167.25 650.62,166.12 649.12,165.75 648.00,165.12 647.12,164.88 646.38,164.88 644.00,164.12 640.38,163.75 639.25,163.38 637.50,163.12 634.50,163.00 634.38,162.88 631.38,162.88 631.25,162.75 622.62,162.88 622.00,162.25 621.62,159.50 621.50,153.62 621.38,153.50 621.88,142.88 622.25,139.62 622.88,136.62 623.25,131.62 623.88,128.38 624.00,124.12 624.38,122.00 624.38,120.62 624.62,119.62 624.62,118.00 624.88,116.25 624.88,103.88 624.12,97.88 624.12,96.75 623.88,95.62 623.75,92.75 623.00,89.25 622.88,87.00 622.12,84.88 621.75,82.50 620.75,79.25 620.12,78.12 619.62,76.38 618.62,74.38 618.00,73.62 617.38,72.25 616.62,71.38 616.25,70.62 613.88,68.25 612.38,67.25 610.62,66.38 608.75,65.88 604.50,65.75 602.12,66.00 600.38,66.38ZM105.88,63.00 104.75,63.00 103.50,62.75 97.50,62.88 96.50,63.00 94.75,63.62 93.00,63.88 90.88,64.50 86.88,66.25 79.88,70.50 74.75,74.62 71.88,77.25 68.75,80.50 63.38,86.75 61.75,89.25 61.12,89.88 59.62,92.25 59.12,92.75 58.00,94.75 57.00,96.00 55.50,98.50 52.25,104.62 52.00,105.50 51.00,107.38 50.88,108.12 50.12,109.50 49.75,111.00 49.12,112.00 48.75,113.62 48.12,115.12 47.88,117.25 47.12,119.50 46.88,121.88 46.12,124.75 46.00,127.12 45.62,128.75 45.62,130.00 45.25,132.62 45.12,137.88 45.38,139.50 45.38,141.25 46.00,145.25 46.12,147.50 46.75,149.25 47.12,151.50 47.75,152.88 48.12,154.62 51.00,160.88 51.88,161.88 52.12,162.62 53.12,164.12 56.00,167.88 60.38,172.00 63.25,174.00 64.50,175.12 72.25,178.75 73.50,179.00 75.00,179.62 77.25,180.00 80.12,180.88 83.38,181.00 86.50,181.38 88.75,181.38 88.88,181.25 90.62,181.25 90.75,181.12 96.00,180.75 97.62,180.12 100.12,179.75 102.12,179.00 103.50,178.75 104.62,178.12 106.88,177.38 111.50,175.25 112.62,174.38 115.25,172.88 116.25,172.00 117.00,171.62 121.50,167.88 123.50,165.88 124.75,164.25 126.75,162.12 128.88,159.25 130.62,156.38 133.50,150.88 134.12,149.12 134.75,148.00 135.12,146.38 135.75,145.12 136.00,143.62 136.88,141.38 137.00,139.25 137.88,136.38 138.00,133.50 138.88,129.25 138.88,124.62 138.50,121.00 137.75,117.88 137.00,116.62 136.62,115.50 135.50,114.25 133.50,113.12 132.50,112.88 80.50,112.88 80.38,112.75 79.00,112.75 78.12,112.25 78.38,111.00 80.88,106.00 82.00,103.12 83.62,100.12 84.00,98.88 84.62,98.00 85.00,96.62 85.62,95.88 86.12,94.75 87.88,92.12 90.25,89.62 92.00,88.25 93.00,87.75 95.62,86.88 97.12,86.00 98.25,85.75 99.38,85.12 100.50,84.88 102.00,84.00 103.38,83.62 104.50,83.00 105.75,82.75 106.88,82.00 108.12,81.62 109.12,81.00 112.50,79.62 116.88,76.75 118.62,74.88 119.38,73.25 119.50,72.62 119.38,71.62 118.50,69.62 117.12,68.25 114.62,66.38 113.12,65.75 111.62,64.75ZM108.62,131.12 109.12,131.62 109.38,132.38 109.38,134.62 109.12,135.75 109.00,138.25 108.62,139.62 108.12,140.62 107.62,143.00 105.50,147.75 103.00,152.00 99.88,156.12 97.25,158.75 96.75,159.00 96.00,159.75 91.88,162.00 90.38,162.25 89.00,162.75 87.62,162.62 85.62,161.62 82.62,159.38 79.88,157.00 75.12,152.00 74.75,151.12 73.25,149.12 72.00,146.75 71.38,143.88 71.38,141.50 71.88,139.50 72.25,138.75 73.75,136.75 75.38,135.25 76.88,134.12 78.00,133.62 78.62,133.12 79.75,132.75 80.88,132.12 83.00,131.75 84.75,131.00 86.62,130.88 88.62,130.25 92.12,129.88 104.25,130.00 107.12,130.50ZM155.00,65.12 154.00,66.00 152.50,66.88 150.50,68.75 149.25,70.25 148.00,72.38 147.75,73.50 147.00,75.00 146.25,78.62 146.12,84.12 146.88,89.25 147.12,92.88 147.88,95.50 148.12,99.25 148.75,101.62 149.00,106.12 149.62,110.12 149.62,112.50 149.75,112.62 149.62,112.75 149.38,123.75 149.00,127.50 149.00,150.12 149.38,152.62 149.62,159.25 149.88,160.00 150.00,163.12 150.38,165.38 150.75,166.50 151.12,169.38 151.88,171.38 152.12,173.12 152.88,175.62 154.38,178.88 156.12,181.88 157.25,183.38 160.12,185.88 162.00,186.75 165.75,187.75 169.12,187.62 170.62,187.12 172.12,186.88 174.12,186.00 175.25,185.75 176.25,185.00 177.12,184.75 178.25,184.12 179.50,183.00 180.62,181.38 181.25,178.75 181.00,174.50 180.75,173.25 180.00,171.25 179.75,168.25 179.50,167.38 179.62,166.50 180.12,166.00 180.50,165.88 182.00,166.00 183.25,166.62 184.62,167.00 185.75,167.62 186.75,167.88 187.88,168.62 190.38,169.88 191.00,170.00 192.12,170.75 195.00,172.00 195.62,172.50 198.38,173.88 199.25,174.12 200.50,175.00 202.88,175.88 204.62,176.88 207.62,178.00 208.62,178.62 210.12,179.00 212.25,179.88 213.12,180.00 214.75,180.75 220.38,181.88 223.75,181.88 225.00,181.62 227.25,180.75 228.25,180.00 229.88,178.38 230.75,177.00 230.88,176.25 231.38,175.12 231.88,172.50 231.88,166.75 231.62,166.25 229.25,164.88 226.62,163.00 224.62,162.00 223.38,160.75 221.00,159.75 218.75,158.12 217.88,157.75 216.38,156.75 215.75,156.12 213.25,154.88 210.88,153.12 208.62,152.00 207.50,151.00 205.62,150.00 204.62,149.12 202.38,148.00 199.75,146.12 197.38,144.75 196.88,144.25 194.00,142.75 192.88,142.00 191.50,140.62 191.25,140.00 192.12,138.00 193.75,136.12 196.12,133.88 206.50,125.50 208.38,123.62 213.75,116.75 214.38,115.62 215.75,113.88 216.25,112.75 217.12,111.62 219.88,106.12 221.75,101.00 222.12,99.00 222.88,96.88 223.50,92.38 223.50,87.75 222.75,83.12 222.12,81.62 221.75,79.75 220.50,77.12 220.00,76.50 218.75,74.12 216.00,70.75 214.25,69.12 211.38,66.88 209.50,65.88 207.50,64.38 206.00,63.88 204.50,63.00 203.25,62.75 202.38,62.25 200.75,61.88 199.38,61.25 197.00,60.88 195.25,60.25 193.88,60.00 192.50,60.00 191.62,59.75 188.62,59.62 185.62,59.25 181.50,59.25 181.38,59.38 176.12,59.62 175.38,59.88 172.12,60.00 170.75,60.25 169.62,60.75 166.50,61.00 164.25,61.75 162.12,62.12 160.62,62.62 158.62,63.62 156.88,64.12ZM193.50,81.00 194.25,81.88 194.75,83.75 194.62,87.38 194.25,88.75 193.88,91.75 193.00,94.25 192.88,95.38 192.25,96.75 191.88,98.62 191.00,100.50 190.88,101.25 190.12,102.50 189.75,103.75 188.00,107.00 186.00,110.00 185.00,111.25 182.75,113.50 181.12,114.75 179.50,115.38 179.25,115.62 178.50,115.88 177.12,115.75 176.62,115.38 176.38,114.88 176.38,111.75 176.25,111.62 176.25,81.75 176.75,81.12 177.38,80.88 193.12,80.88ZM827.12,58.12 823.62,57.12 821.12,57.00 816.25,56.38 812.50,56.25 811.12,56.00 785.38,56.00 783.62,56.25 781.12,56.25 781.00,56.38 777.62,56.50 775.88,56.75 773.62,56.75 773.50,56.88 765.62,57.00 759.75,57.88 755.38,58.12 749.25,59.25 747.25,60.12 746.38,60.88 745.50,61.00 744.62,61.50 742.12,63.75 741.25,65.25 741.00,66.88 741.00,68.62 741.12,69.12 742.50,70.88 744.12,71.00 746.62,71.88 748.75,72.12 750.50,72.88 752.12,73.00 754.50,73.88 756.25,74.00 758.38,74.88 760.00,75.00 762.00,75.75 764.50,76.12 766.38,76.88 767.25,76.88 769.00,77.25 770.12,77.88 770.88,78.75 770.88,173.62 771.00,173.75 771.00,175.12 771.62,176.12 773.50,177.88 774.88,178.75 777.12,179.62 781.12,180.38 787.00,180.38 789.50,179.88 791.25,179.75 795.12,177.75 796.75,176.25 797.25,175.50 797.88,173.38 797.88,77.00 798.00,76.25 798.50,75.62 799.25,75.62 800.25,76.00 801.88,76.12 804.25,76.75 807.62,76.88 810.62,76.50 813.38,75.88 815.25,75.75 816.25,75.25 818.00,74.88 819.38,74.25 821.50,73.62 822.38,73.12 823.50,72.88 824.50,72.00 825.25,71.88 827.00,70.88 828.00,70.00 828.88,69.50 830.50,67.88 831.38,67.25 831.88,66.50 832.75,64.25 832.75,63.12 831.88,61.12 831.12,60.38 829.38,59.12ZM446.38,44.38 445.88,45.62 445.75,47.12 445.25,47.75 444.12,48.00 442.62,48.00 442.00,48.25 441.62,48.75 441.62,50.88 441.88,51.50 442.75,51.88 444.88,51.88 445.25,52.00 445.75,52.50 445.88,52.88 445.88,59.25 445.62,60.50 444.75,61.00 443.62,61.12 441.00,62.00 440.12,62.12 437.88,63.25 437.25,63.75 435.88,64.38 432.38,67.38 431.12,68.88 429.25,71.88 428.88,73.25 428.25,74.50 427.12,78.62 427.12,79.88 427.62,81.25 428.25,81.75 429.00,82.00 431.12,82.25 465.88,82.25 467.75,82.00 468.50,81.38 468.88,80.38 468.88,77.00 467.38,72.88 466.75,71.62 465.12,69.25 462.75,66.62 461.25,65.25 459.62,64.12 456.12,62.12 451.25,60.88 450.50,60.12 450.38,55.62 450.25,55.50 450.38,52.75 450.75,52.25 451.25,52.00 454.50,51.88 455.38,51.50 455.50,51.25 455.50,48.88 455.25,48.38 454.25,48.00 451.50,48.00 450.88,47.75 450.25,47.00 449.50,44.50 448.75,44.00 447.50,44.00ZM376.62,38.25 376.00,38.88 375.12,40.62 375.00,41.38 374.50,42.00 373.38,42.38 371.62,42.50 371.25,42.75 370.88,43.62 370.88,45.25 371.25,45.75 371.88,46.00 374.12,46.12 374.75,46.62 374.88,47.00 374.88,48.75 375.00,48.88 374.88,60.88 374.62,61.38 374.12,61.75 371.25,62.38 370.25,62.88 369.25,63.12 367.50,64.12 365.12,65.88 362.12,68.88 360.12,71.62 358.12,76.00 357.88,77.62 357.25,79.38 357.38,81.00 358.00,82.00 358.75,82.75 360.62,83.50 362.75,83.88 367.50,83.88 367.62,84.00 372.25,84.00 372.38,84.12 387.38,84.12 387.50,84.00 395.62,83.88 397.25,83.50 398.12,83.00 398.75,82.12 398.88,78.62 397.62,73.88 396.88,72.00 395.50,70.00 392.12,66.38 390.62,65.25 389.50,64.88 388.38,63.88 386.88,63.12 385.50,62.75 384.12,62.12 381.38,61.75 380.50,60.88 380.38,60.38 380.38,47.62 380.50,47.00 381.00,46.38 381.50,46.12 383.50,46.00 384.38,45.50 384.50,45.25 384.50,42.88 384.25,42.50 382.12,42.38 381.12,42.12 380.25,41.25 379.75,39.25 379.00,38.50 378.38,38.12Z"/></symbol>
+</svg>
+
+<div id="progress"></div>
+
+<!-- ======================= NAVEGACIÓN ======================= -->
+<nav class="nav" id="nav">
+  <div class="wrap">
+    <a href="#inicio" class="pill" aria-label="Inicio"><svg class="logo" viewBox="0 0 865.6 161.6" role="img" aria-label="Gramalote"><use href="#logo"/></svg></a>
+    <button class="burger" id="burger" aria-label="Abrir menú">&#9776;</button>
+    <ul id="menu">
+      <li><a class="link" href="#prologo">Quiénes somos</a></li>
+      <li><a class="link" href="#historia">Historia</a></li>
+      <li><a class="link" href="#iglesia">Iglesia</a></li>
+      <li><a class="link" href="#cultura">Cultura</a></li>
+      <li><a class="link" href="#sabores">Sabores</a></li>
+      <li><a class="link" href="#paisajes">Paisajes</a></li>
+      <li><a class="link" href="#renacer">Renacer</a></li>
+    </ul>
+  </div>
+</nav>
+
+<!-- ======================= PORTADA ======================= -->
+<header class="hero" id="inicio" data-nav="azul">
+  <div class="wrap">
+    <span class="eyebrow">Serie documental · Norte de Santander</span>
+    <svg class="brand-logo" viewBox="0 0 865.6 161.6" role="img" aria-label="Gramalote"><use href="#logo"/></svg>
+    <p class="sub">Un pueblo en el recuerdo</p>
+    <p class="meta">1857 &nbsp;—&nbsp; 2010 &nbsp;—&nbsp; Siempre</p>
+  </div>
+  <div class="hero-photo">
+    <div class="frame">
+      <img id="heroImg" src="img/aerea-iglesia.jpg" alt="Vista aérea de las ruinas del antiguo Gramalote rodeadas de vegetación">
+      <span class="cap">Antiguo casco urbano · vista aérea</span>
+    </div>
+  </div>
+</header>
+
+<!-- ======================= QUIÉNES SOMOS ======================= -->
+<section class="prologo pad" id="prologo" data-nav="azul">
+  <div class="wrap">
+    <figure class="banner reveal">
+      <img src="img/plaza-iglesia.jpg" alt="Vista aérea de la cúpula de la iglesia y la plaza del antiguo Gramalote">
+      <figcaption class="placa">
+        <svg class="" viewBox="0 0 865.6 161.6" role="img" aria-label="Gramalote"><use href="#logo"/></svg>
+        <span>La plaza y la cúpula de San Rafael, hoy</span>
+      </figcaption>
+    </figure>
+    <div class="grid">
+      <div class="reveal">
+        <span class="kicker">¿Quiénes somos?</span>
+        <h2 class="title">Una historia que <em>permanece</em></h2>
+        <div class="bandera"><i></i><i></i><i></i></div>
+      </div>
+      <div class="text reveal d1">
+        <div class="barra">
+          <p>Esta serie documental es una mirada a la historia de Gramalote y a los acontecimientos que transformaron profundamente la vida de sus habitantes. A través de imágenes, testimonios, archivos y memorias, el proyecto busca reconstruir una historia que no puede ser olvidada.</p>
+          <p>Gramalote fue —y sigue siendo— una tierra de montaña, de café y de gente unida. Este es el relato de cómo un pueblo perdió sus calles, pero no su identidad.</p>
+        </div>
+        <div class="stats">
+          <div class="stat"><b data-count="1857">0</b><small>Año de fundación</small></div>
+          <div class="stat"><b data-count="153">0</b><small>Años de historia</small></div>
+          <div class="stat"><b data-count="48">0</b><small>Horas que lo cambiaron todo</small></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="fade" style="--a:var(--blanco);--b:var(--amarillo-fondo)"></div>
+
+<!-- ======================= CAPÍTULO I · HISTORIA (con 2010) ======================= -->
+<section class="historia pad" id="historia" data-nav="amarillo" style="padding-top:30px">
+  <div class="wrap">
+    <div class="center reveal">
+      <span class="kicker">Capítulo I · Historia</span>
+      <h2 class="title">De la fundación <em>al último día</em></h2>
+      <div class="bandera"><i></i><i></i><i></i></div>
+      <p class="lead">Más de siglo y medio de vida en las montañas de Norte de Santander, a unos 45 kilómetros de Cúcuta.</p>
+    </div>
+    <div class="timeline">
+      <article class="event reveal">
+        <div class="year">1857</div>
+        <h3>Nace un caserío</h3>
+        <p>El 27 de noviembre se funda el primer asentamiento. Su nombre vendría, según la tradición, de la grama: la hierba que cubría estas laderas.</p>
+      </article>
+      <article class="event reveal">
+        <div class="year">1883</div>
+        <h3>El pueblo se traslada</h3>
+        <p>La población se reubica en el sitio que todos recordarán, y comienza la construcción del templo dedicado a San Rafael Arcángel.</p>
+      </article>
+      <article class="event reveal">
+        <div class="year">1940</div>
+        <h3>La cúpula del pueblo</h3>
+        <p>Se completa la gran cúpula de la iglesia. Alrededor de la plaza crece un pueblo cafetero de casas blancas y calles empinadas.</p>
+      </article>
+      <article class="event reveal">
+        <div class="year">1957</div>
+        <h3>Las torres se levantan</h3>
+        <p>Se reconstruyen las torres del templo. Gramalote se consolida como uno de los grandes productores de café de la región.</p>
+      </article>
+    </div>
+
+    <!-- 2010: la tragedia, dentro de Historia -->
+    <article class="dosmil reveal" id="dosmil">
+      <span class="kicker">Diciembre de 2010</span>
+      <div class="year-big">2010</div>
+      <h2 class="title">La tierra <em>se movió</em></h2>
+      <p class="lead">Tras semanas de lluvias intensas, una falla geológica y el suelo saturado hicieron que Gramalote empezara a hundirse, lentamente, ante los ojos de sus habitantes.</p>
+      <div class="dias">
+        <div class="dia">
+          <b>16 de diciembre</b>
+          <p>A primera hora de la mañana aparecen las primeras grietas. Las casas crujen y las calles empiezan a abrirse.</p>
+        </div>
+        <div class="dia">
+          <b>17 de diciembre</b>
+          <p>Se ordena la evacuación total. En unas 48 horas, barrios enteros, la plaza y la iglesia quedan destruidos.</p>
+        </div>
+      </div>
+      <blockquote>No hubo un solo muerto.</blockquote>
+      <cite>Más de 6.000 personas evacuadas · Diciembre de 2010</cite>
+    </article>
+  </div>
+</section>
+
+<div class="fade" style="--a:var(--amarillo-fondo);--b:var(--azul-fondo)"></div>
+
+<!-- ======================= CAPÍTULO II · LA IGLESIA ======================= -->
+<section class="iglesia pad" id="iglesia" data-nav="azul" style="padding-top:30px">
+  <div class="wrap">
+    <div class="grid">
+      <div class="photo reveal">
+        <img src="img/iglesia-ruinas.jpg" alt="Fachada agrietada de la antigua iglesia de San Rafael en Gramalote">
+      </div>
+      <div class="reveal d1">
+        <span class="kicker">Capítulo II · Iglesia</span>
+        <h2 class="title">Dedicada a <em>San Rafael</em></h2>
+        <div class="bandera"><i></i><i></i><i></i></div>
+        <p class="lead">La iglesia central fue el corazón espiritual del pueblo. Bajo su cúpula se celebraron bautizos, matrimonios y procesiones durante más de un siglo.</p>
+        <ul class="facts">
+          <li><b>1883</b><span>Inicia su construcción, junto con el traslado del pueblo.</span></li>
+          <li><b>1940</b><span>Se termina la cúpula principal, símbolo del paisaje.</span></li>
+          <li><b>2010</b><span>Una de sus torres se desploma; la fachada queda partida por las grietas.</span></li>
+          <li><b>Hoy</b><span>Sus ruinas permanecen en pie como monumento a la memoria colectiva.</span></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="fade" style="--a:var(--azul-fondo);--b:var(--amarillo-fondo)"></div>
+
+<!-- ======================= CAPÍTULO III · CULTURA ======================= -->
+<section class="cultura pad" id="cultura" data-nav="verde" style="padding-top:30px">
+  <div class="wrap">
+    <div class="center reveal">
+      <span class="kicker">Capítulo III · Cultura</span>
+      <h2 class="title">Una cultura <em>que se hereda</em></h2>
+      <div class="bandera"><i></i><i></i><i></i></div>
+      <p class="lead">Lo que hace a Gramalote no son sus muros: son sus costumbres, su trabajo y su fe.</p>
+    </div>
+    <div class="cards">
+      <article class="card c-amarillo reveal">
+        <div class="band"></div>
+        <div class="body">
+          <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 8h1a4 4 0 1 1 0 8h-1"/><path d="M3 8h14v9a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4Z"/><path d="M6 2v2M10 2v2M14 2v2"/></svg></div>
+          <h3>Tierra cafetera</h3>
+          <p>El café ha sido el motor de la economía: más de la mitad de los ingresos del municipio. Le siguen la ganadería, la panela, el fríjol, el plátano y los cítricos.</p>
+        </div>
+      </article>
+      <article class="card c-verde reveal d1">
+        <div class="band"></div>
+        <div class="body">
+          <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M5 8h14"/></svg></div>
+          <h3>Fe y procesiones</h3>
+          <p>La Semana Santa, con sus procesiones solemnes, y la devoción a la Virgen de Monguí, patrona del municipio, reúnen a todo el pueblo cada año.</p>
+        </div>
+      </article>
+      <article class="card c-azul reveal d2">
+        <div class="band"></div>
+        <div class="body">
+          <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l2.5 5 5.5.8-4 3.9.9 5.5L12 15.6 7.1 18.2l.9-5.5-4-3.9 5.5-.8Z"/></svg></div>
+          <h3>Fiestas de diciembre</h3>
+          <p>Del 16 al 24 de diciembre, desfiles, concursos y misas llenaban las calles. Hoy esas fechas también son tiempo de recordar.</p>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<div class="fade" style="--a:var(--amarillo-fondo);--b:var(--verde-oscuro)"></div>
+
+<!-- ======================= CAPÍTULO IV · SABORES ======================= -->
+<section class="sabores pad" id="sabores" data-nav="amarillo" style="padding-top:30px">
+  <div class="wrap">
+    <div class="reveal">
+      <span class="kicker">Capítulo IV · Sabores</span>
+      <h2 class="title">Heredando <em>recetas</em></h2>
+      <div class="bandera"><i></i><i></i><i></i></div>
+      <p class="lead">La gastronomía de Gramalote es un reflejo de la tradición nortesantandereana: cocina de fogón, de leña y de familia.</p>
+    </div>
+    <div class="grid">
+      <div class="platos">
+        <figure class="plato a reveal">
+          <span class="tag">Plato insignia</span>
+          <img src="img/comida-mute.jpg" alt="Plato de mute santandereano servido en cazuela de barro">
+        </figure>
+        <figure class="plato b reveal d1">
+          <span class="tag">Chorizo con arepa</span>
+          <img src="img/comida-chorizo.jpg" alt="Dos chorizos asados sobre arepa de maíz, acompañados de limón">
+        </figure>
+      </div>
+      <ul class="menu">
+        <li class="reveal">
+          <div class="row"><h3>Mute</h3><span class="dots"></span><span class="when">Domingo</span></div>
+          <p>Sopa espesa de maíz pelado con carnes, papa y verduras, cocinada a fuego lento durante horas. El plato que reúne a la familia.</p>
+        </li>
+        <li class="reveal">
+          <div class="row"><h3>Pepitoria</h3><span class="dots"></span><span class="when">Tradición</span></div>
+          <p>Arroz preparado con las vísceras y la sangre del cabro, sazonado con hierbas. Compañero inseparable del cabro asado.</p>
+        </li>
+        <li class="reveal">
+          <div class="row"><h3>Chorizo con arepa</h3><span class="dots"></span><span class="when">Al fogón</span></div>
+          <p>Chorizos asados a la brasa, servidos sobre arepa de maíz y con limón para exprimir. Sabor de plaza y de fin de semana.</p>
+        </li>
+        <li class="reveal">
+          <div class="row"><h3>Arepa santandereana</h3><span class="dots"></span><span class="when">Desayuno</span></div>
+          <p>Delgada y crocante, de maíz pelado con chicharrón. Se acompaña con café recién colado de la propia finca.</p>
+        </li>
+        <li class="reveal">
+          <div class="row"><h3>Hayacas</h3><span class="dots"></span><span class="when">Navidad</span></div>
+          <p>Masa de maíz rellena de guiso de carnes, envuelta en hoja de plátano. Prepararlas es un ritual familiar de diciembre.</p>
+        </li>
+        <li class="reveal">
+          <div class="row"><h3>Cuajada con melao</h3><span class="dots"></span><span class="when">Postre</span></div>
+          <p>Queso fresco bañado en miel de panela, fruto de los trapiches que endulzan la región.</p>
+        </li>
+        <li class="reveal">
+          <div class="row"><h3>Café de origen</h3><span class="dots"></span><span class="when">Todo el día</span></div>
+          <p>Cultivado en las laderas a más de mil metros de altura. En Gramalote, el café no se toma: se comparte.</p>
+        </li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ======================= CAPÍTULO V · PAISAJES ======================= -->
+<section class="paisajes" id="paisajes" data-nav="azul">
+  <div class="bg" id="paisajeBg"></div>
+  <div class="wrap reveal">
+    <span class="kicker">Capítulo V · Paisajes</span>
+    <h2 class="title">Unidos <em>en el desastre</em></h2>
+    <p>Antes de la tragedia, Gramalote era un pueblo tranquilo rodeado de montañas, quebradas y cascadas. Ese paisaje sigue ahí, recordándonos que la tierra que se movió es la misma que, por generaciones, dio de comer a su gente.</p>
+  </div>
+</section>
+
+<!-- ======================= EPÍLOGO · RENACER ======================= -->
+<section class="renacer pad" id="renacer" data-nav="verde">
+  <div class="wrap reveal">
+    <span class="kicker">Epílogo · 2016</span>
+    <h2 class="title">Recordar también es <em>reconstruir</em></h2>
+    <div class="bandera" style="margin-left:auto;margin-right:auto"><i></i><i></i><i></i></div>
+    <p class="lead">El 20 de diciembre de 2016 se inauguró el nuevo Gramalote, en el sector de Miraflores, a unos 20 minutos del pueblo original. El nuevo pueblo creció allí, pero el viejo vive en cada historia contada. Esta serie es nuestra forma de conservarlo.</p>
+    <a href="#inicio" class="btn">Volver al inicio &uarr;</a>
+  </div>
+</section>
+
+<div class="fade" style="--a:var(--blanco);--b:var(--azul-fondo);height:60px"></div>
+
+<!-- ======================= PIE DE PÁGINA ======================= -->
+<footer data-nav="amarillo">
+  <div class="wrap">
+    <div class="cols">
+      <div>
+        <span class="placa-logo"><svg class="flogo" viewBox="0 0 865.6 161.6" role="img" aria-label="Gramalote"><use href="#logo"/></svg></span>
+        <p>Un pueblo en el recuerdo. Gramalote, una tierra de gran tradición cafetera.</p>
+      </div>
+      <div>
+        <h4>Sobre nosotros</h4>
+        <ul>
+          <li><a href="#prologo">Quiénes somos</a></li>
+          <li><a href="#historia">Historia</a></li>
+          <li><a href="#cultura">Cultura</a></li>
+          <li><a href="#sabores">Sabores</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Síguenos</h4>
+        <div class="social">
+          <a href="#" aria-label="Facebook"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M14 8h3V4h-3a4 4 0 0 0-4 4v2H8v4h2v8h4v-8h3l1-4h-4V8Z"/></svg></a>
+          <a href="#" aria-label="Instagram"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor"/></svg></a>
+          <a href="#" aria-label="YouTube"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M22 8.2a3 3 0 0 0-2.1-2.1C18 5.6 12 5.6 12 5.6s-6 0-7.9.5A3 3 0 0 0 2 8.2 31 31 0 0 0 1.6 12 31 31 0 0 0 2 15.8a3 3 0 0 0 2.1 2.1c1.9.5 7.9.5 7.9.5s6 0 7.9-.5a3 3 0 0 0 2.1-2.1 31 31 0 0 0 .4-3.8 31 31 0 0 0-.4-3.8ZM10 15V9l5.2 3Z"/></svg></a>
+        </div>
+      </div>
+    </div>
+    <div class="copy">
+      <span>Copyright © 2026 · proyectogramalote.site</span>
+      <span>Serie documental Gramalote</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+  const nav = document.getElementById('nav');
+  const bar = document.getElementById('progress');
+  const heroImg = document.getElementById('heroImg');
+  const paisajeBg = document.getElementById('paisajeBg');
+  const zonas = [...document.querySelectorAll('[data-nav]')];
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  function onScroll(){
+    const y = window.scrollY;
+    const solid = y > 120;
+    nav.classList.toggle('solid', solid);
+    // Tema de la barra según el capítulo que está debajo de ella
+    let theme = '';
+    if(solid){ for(const z of zonas){ if(z.getBoundingClientRect().top <= 80) theme = z.dataset.nav; } }
+    if(nav.dataset.theme !== theme){ theme ? nav.dataset.theme = theme : delete nav.dataset.theme; }
+    // Barra de progreso
+    const h = document.documentElement.scrollHeight - innerHeight;
+    bar.style.width = (h > 0 ? (y / h) * 100 : 0) + '%';
+    // Parallax suave en fotos
+    if(reduce) return;
+    [heroImg, paisajeBg].forEach(el => {
+      const r = el.parentElement.getBoundingClientRect();
+      if(r.bottom > 0 && r.top < innerHeight){
+        const p = (r.top + r.height / 2 - innerHeight / 2) / innerHeight;
+        el.style.transform = `translateY(${p * -8}%)`;
+      }
+    });
+  }
+  addEventListener('scroll', onScroll, {passive:true}); onScroll();
+
+  // Menú móvil
+  const burger = document.getElementById('burger'), menu = document.getElementById('menu');
+  burger.addEventListener('click', () => menu.classList.toggle('open'));
+  menu.querySelectorAll('a').forEach(a => a.addEventListener('click', () => menu.classList.remove('open')));
+
+  // Aparición de elementos al hacer scroll
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(e => { if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target); } });
+  }, {threshold:.12});
+  document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+
+  // Contadores animados
+  const counters = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if(!e.isIntersecting) return;
+      const el = e.target, end = +el.dataset.count, t0 = performance.now(), dur = 1600;
+      (function tick(t){
+        const p = Math.min((t - t0) / dur, 1);
+        el.textContent = Math.round(end * (1 - Math.pow(1 - p, 3)));
+        if(p < 1) requestAnimationFrame(tick);
+      })(t0);
+      counters.unobserve(el);
+    });
+  }, {threshold:.6});
+  document.querySelectorAll('[data-count]').forEach(el => counters.observe(el));
+
+  // Resaltar en el menú la sección visible
+  const links = [...document.querySelectorAll('.nav a.link')];
+  const spy = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if(e.isIntersecting){
+        links.forEach(l => l.classList.toggle('active', l.getAttribute('href') === '#' + e.target.id));
+      }
+    });
+  }, {rootMargin:'-45% 0px -50% 0px'});
+  document.querySelectorAll('section[id]').forEach(s => spy.observe(s));
+</script>
+</body>
+</html>
